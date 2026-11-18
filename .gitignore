@@ -1,0 +1,13 @@
+# Sensible Konfigurationen
+config.json
+.env
+
+# Lokale Daten & Logs
+logs/
+backups/
+*.db
+*.sqlite3
+
+# Python & VS Code
+__pycache__/
+.vscode/

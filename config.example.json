@@ -1,0 +1,7 @@
+{
+  "database_path": "data/ordnungsamt_bestand.db",
+  "csv_export_path": "data/aussendienst_export.csv",
+  "backup_dir": "backups",
+  "log_dir": "logs",
+  "retention_days": 7
+}
