@@ -14,30 +14,30 @@ write_log() {
     echo "$ENTRY" | tee -a "$LOG_FILE"
 }
 
-write_log "INFO" "Starte Linux System-Health-Check..."
+write_log "INFO" "Starting Linux System Health Check..."
 
-# 1. Festplattenspeicher prüfen (Root-Partition /)
+# 1. Check disk space (Root partition /)
 USED_PERCENT=$(df / | awk 'NR==2 {print $5}' | tr -d '%')
 FREE_PERCENT=$((100 - USED_PERCENT))
 
 if [ "$FREE_PERCENT" -lt "$MIN_FREE_PERCENT" ]; then
-    write_log "WARN" "Freier Speicher auf / liegt bei nur ${FREE_PERCENT}% (Schwellenwert: ${MIN_FREE_PERCENT}%)"
+    write_log "WARN" "Free disk space on / is only ${FREE_PERCENT}% (Threshold: ${MIN_FREE_PERCENT}%)"
 else
-    write_log "INFO" "Festplattenspeicher / OK (${FREE_PERCENT}% frei)"
+    write_log "INFO" "Disk space / OK (${FREE_PERCENT}% free)"
 fi
 
-# 2. Freien Arbeitsspeicher prüfen
+# 2. Check available memory
 FREE_MEM_MB=$(free -m | awk 'NR==2 {print $7}')
-write_log "INFO" "Verfügbarer Arbeitsspeicher: ${FREE_MEM_MB} MB"
+write_log "INFO" "Available memory: ${FREE_MEM_MB} MB"
 
-# 3. Wichtige Systemdienste prüfen
+# 3. Check critical system services
 SERVICES=("cron" "systemd-journald")
 for SERVICE in "${SERVICES[@]}"; do
     if systemctl is-active --quiet "$SERVICE"; then
-        write_log "INFO" "Dienst '$SERVICE' läuft ordnungsgemäß."
+        write_log "INFO" "Service '$SERVICE' is running properly."
     else
-        write_log "WARN" "Dienst '$SERVICE' läuft nicht oder wurde nicht gefunden."
+        write_log "WARN" "Service '$SERVICE' is not running or was not found."
     fi
 done
 
-write_log "INFO" "System-Health-Check abgeschlossen."
+write_log "INFO" "System Health Check completed."

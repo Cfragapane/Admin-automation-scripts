@@ -1,8 +1,8 @@
 <#
 .SYNOPSIS
-    Überprüft kritische Systemressourcen und protokolliert Warnmeldungen.
+    Monitors critical system resources and logs warning messages.
 .DESCRIPTION
-    Prüft freien Festplattenspeicher, Arbeitsspeicher-Auslastung sowie wichtige Windows-Dienste.
+    Checks free disk space, available memory, and essential Windows services.
 #>
 
 param (
@@ -23,31 +23,31 @@ function Write-Log {
     Write-Host $Entry
 }
 
-Write-Log "Starte System-Health-Check..."
+Write-Log "Starting System Health Check..."
 
 $Disk = Get-CimInstance -ClassName Win32_LogicalDisk -Filter "DeviceID='C:'"
 $FreePercent = [math]::Round(($Disk.FreeSpace / $Disk.Size) * 100, 2)
 
 if ($FreePercent -lt $MinFreeSpacePercent) {
-    Write-Log "WARNUNG: Freier Speicher auf C: liegt bei nur $FreePercent% (Schwellenwert: $MinFreeSpacePercent%)" "WARN"
+    Write-Log "WARNING: Free disk space on C: is only $FreePercent% (Threshold: $MinFreeSpacePercent%)" "WARN"
 } else {
-    Write-Log "Festplattenspeicher C: OK ($FreePercent% frei)" "INFO"
+    Write-Log "Disk space C: OK ($FreePercent% free)" "INFO"
 }
 
 $OS = Get-CimInstance -ClassName Win32_OperatingSystem
 $FreeMemoryGB = [math]::Round($OS.FreePhysicalMemory / 1MB, 2)
-Write-Log "Freier Arbeitsspeicher: $FreeMemoryGB GB" "INFO"
+Write-Log "Free memory: $FreeMemoryGB GB" "INFO"
 
 $ServicesToCheck = @("EventLog", "wuauserv")
 foreach ($ServiceName in $ServicesToCheck) {
     $Service = Get-Service -Name $ServiceName -ErrorAction SilentlyContinue
     if ($null -eq $Service) {
-        Write-Log "Dienst '$ServiceName' nicht gefunden." "WARN"
+        Write-Log "Service '$ServiceName' not found." "WARN"
     } elseif ($Service.Status -ne "Running") {
-        Write-Log "WARNUNG: Dienst '$($Service.DisplayName)' läuft nicht (Status: $($Service.Status))" "WARN"
+        Write-Log "WARNING: Service '$($Service.DisplayName)' is not running (Status: $($Service.Status))" "WARN"
     } else {
-        Write-Log "Dienst '$($Service.DisplayName)' läuft ordnungsgemäß." "INFO"
+        Write-Log "Service '$($Service.DisplayName)' is running properly." "INFO"
     }
 }
 
-Write-Log "System-Health-Check abgeschlossen."
+Write-Log "System Health Check completed."

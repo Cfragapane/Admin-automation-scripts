@@ -18,49 +18,49 @@ logging.basicConfig(
 
 def run_sync_check(db_path, csv_path):
     if not os.path.exists(db_path) or not os.path.exists(csv_path):
-        raise FileNotFoundError("Datenbank oder CSV-Datei wurde nicht gefunden. Bitte zuerst db_backup.py ausführen.")
+        raise FileNotFoundError("Database or CSV file not found. Please run db_backup.py first.")
 
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    cursor.execute("SELECT personal_nr, name, abteilung, status FROM personal_bestand")
-    db_records = {row[0]: {"name": row[1], "abteilung": row[2], "status": row[3]} for row in cursor.fetchall()}
+    cursor.execute("SELECT staff_id, name, department, status FROM staff_records")
+    db_records = {row[0]: {"name": row[1], "department": row[2], "status": row[3]} for row in cursor.fetchall()}
     conn.close()
 
     csv_records = {}
     with open(csv_path, mode="r", encoding="utf-8") as f:
         reader = csv.DictReader(f, delimiter=";")
         for row in reader:
-            csv_records[row["personal_nr"]] = {
+            csv_records[row["staff_id"]] = {
                 "name": row["name"],
-                "abteilung": row["abteilung"],
+                "department": row["department"],
                 "status": row["status"]
             }
 
-    print("=== PRÜFPROTOKOLL: DATENABGLEICH ===")
-    logging.info("Starte Datenabgleich zwischen CSV und Datenbank.")
+    print("=== AUDIT LOG: DATA SYNCHRONIZATION ===")
+    logging.info("Starting data synchronization check between CSV and database.")
 
-    for p_nr, data in csv_records.items():
-        if p_nr not in db_records:
-            msg = f"[NEU IN CSV] {p_nr} ({data['name']}) fehlt in der Datenbank."
+    for s_id, data in csv_records.items():
+        if s_id not in db_records:
+            msg = f"[NEW IN CSV] {s_id} ({data['name']}) is missing in the database."
             print(msg)
             logging.warning(msg)
-        elif data != db_records[p_nr]:
-            msg = f"[ABWEICHUNG] {p_nr} ({data['name']}): CSV={data} vs. DB={db_records[p_nr]}"
-            print(msg)
-            logging.warning(msg)
-
-    for p_nr, data in db_records.items():
-        if p_nr not in csv_records:
-            msg = f"[FEHLT IN CSV] {p_nr} ({data['name']}) ist in DB vorhanden, aber nicht im aktuellen Export."
+        elif data != db_records[s_id]:
+            msg = f"[MISMATCH] {s_id} ({data['name']}): CSV={data} vs. DB={db_records[s_id]}"
             print(msg)
             logging.warning(msg)
 
-    logging.info("Datenabgleich erfolgreich beendet.")
-    print("=== PRÜFUNG ABGESCHLOSSEN ===")
+    for s_id, data in db_records.items():
+        if s_id not in csv_records:
+            msg = f"[MISSING IN CSV] {s_id} ({data['name']}) exists in DB, but not in the current export."
+            print(msg)
+            logging.warning(msg)
+
+    logging.info("Data synchronization check completed successfully.")
+    print("=== AUDIT COMPLETED ===")
 
 if __name__ == "__main__":
     try:
         run_sync_check(config["database_path"], config["csv_export_path"])
     except Exception as e:
-        logging.error(f"Fehler beim Datenabgleich: {e}")
-        print(f"[FEHLER] {e}")
+        logging.error(f"Error during data synchronization: {e}")
+        print(f"[ERROR] {e}")

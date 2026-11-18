@@ -21,41 +21,41 @@ logging.basicConfig(
 )
 
 def init_demo_database(db_path):
-    """Erstellt eine Demo-Datenbank für das Ordnungsamt, falls noch keine existiert."""
+    """Creates a demo database for municipal administration if none exists yet."""
     if not os.path.exists(db_path):
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         cursor.execute("""
-            CREATE TABLE personal_bestand (
-                personal_nr TEXT PRIMARY KEY,
+            CREATE TABLE staff_records (
+                staff_id TEXT PRIMARY KEY,
                 name TEXT NOT NULL,
-                abteilung TEXT NOT NULL,
+                department TEXT NOT NULL,
                 status TEXT NOT NULL
             )
         """)
-        demo_daten = [
-            ("OA-101", "Max Mustermann", "Kommunaler Ordnungsdienst", "Aktiv"),
-            ("OA-102", "Erika Musterfrau", "Bußgeldstelle", "Aktiv"),
-            ("OA-103", "Thomas Schmidt", "Gewerbeaufsicht", "Aktiv")
+        demo_data = [
+            ("OA-101", "Max Mustermann", "Municipal Code Enforcement", "Active"),
+            ("OA-102", "Erika Musterfrau", "Fines & Citations Office", "Active"),
+            ("OA-103", "Thomas Schmidt", "Trade Supervision", "Active")
         ]
-        cursor.executemany("INSERT INTO personal_bestand VALUES (?, ?, ?, ?)", demo_daten)
+        cursor.executemany("INSERT INTO staff_records VALUES (?, ?, ?, ?)", demo_data)
         conn.commit()
         conn.close()
-        logging.info(f"Demo-Datenbank unter {db_path} initialisiert.")
+        logging.info(f"Demo database initialized at {db_path}.")
 
 def create_backup(db_path, backup_dir):
-    """Erstellt eine zeitgestempelte Sicherungskopie der Datenbank."""
+    """Creates a timestamped backup copy of the database."""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    backup_filename = f"backup_ordnungsamt_{timestamp}.db"
+    backup_filename = f"backup_agency_{timestamp}.db"
     backup_path = os.path.join(backup_dir, backup_filename)
     
     shutil.copy2(db_path, backup_path)
-    logging.info(f"Backup erfolgreich erstellt: {backup_path}")
-    print(f"[OK] Backup erstellt: {backup_path}")
+    logging.info(f"Backup successfully created: {backup_path}")
+    print(f"[OK] Backup created: {backup_path}")
 
 def cleanup_old_backups(backup_dir, retention_days):
-    """Löscht Backups, die älter als die festgelegte Aufbewahrungsfrist sind."""
+    """Deletes backups older than the defined retention period."""
     cutoff_date = datetime.now() - timedelta(days=retention_days)
     deleted_count = 0
 
@@ -65,10 +65,10 @@ def cleanup_old_backups(backup_dir, retention_days):
             file_mtime = datetime.fromtimestamp(os.path.getmtime(filepath))
             if file_mtime < cutoff_date:
                 os.remove(filepath)
-                logging.info(f"Altes Backup gemäß Retention Policy gelöscht: {filename}")
+                logging.info(f"Old backup deleted per retention policy: {filename}")
                 deleted_count += 1
 
-    print(f"[INFO] Bereinigung abgeschlossen. Gelöschte alte Backups: {deleted_count}")
+    print(f"[INFO] Cleanup completed. Deleted old backups: {deleted_count}")
 
 if __name__ == "__main__":
     try:
@@ -76,5 +76,5 @@ if __name__ == "__main__":
         create_backup(config["database_path"], config["backup_dir"])
         cleanup_old_backups(config["backup_dir"], config["retention_days"])
     except Exception as e:
-        logging.error(f"Fehler beim Backup-Prozess: {e}")
-        print(f"[FEHLER] {e}")
+        logging.error(f"Error during backup process: {e}")
+        print(f"[ERROR] {e}")

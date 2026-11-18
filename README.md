@@ -1,20 +1,20 @@
-# 🛠️ Admin & Datenbank Automatisierungs-Skripte
+# 🛠️ Admin & Database Automation Scripts
 
-Dieses Repository enthält eine Auswahl an Skripten zur Automatisierung wiederkehrender Aufgaben in der System- und Datenbankadministration.
+This repository contains a collection of scripts for automating recurring tasks in system and database administration.
 
-## 📋 Enthaltene Skripte
+## 📋 Included Scripts
 
-* **`db_backup.py`** – Erstellt automatisierte, zeitgestempelte Sicherungen von SQL-Datenbanken inklusive Bereinigung alter Backups (Retention Policy).
-* **`data_sync_check.py`** – Vergleicht CSV-Exporte mit Datenbankbeständen, erkennt Abweichungen und erstellt ein übersichtliches Prüfprotokoll.
-* **`system_health_check.ps1` / `.sh`** – Überprüft kritische Systemressourcen (Festplattenspeicher, Arbeitsspeicher, laufende Dienste) unter Windows und Linux und protokolliert Warnmeldungen.
+* **`db_backup.py`** – Creates automated, timestamped backups of SQL databases including cleanup of outdated backups (Retention Policy).
+* **`data_sync_check.py`** – Compares CSV exports against database records, detects discrepancies, and generates a clear audit log.
+* **`system_health_check.ps1` / `.sh`** – Monitors critical system resources (disk space, memory, running services) on Windows and Linux and logs warnings.
 
-## 🎯 Fokus & Best Practices
+## 🎯 Focus & Best Practices
 
-* **Nachvollziehbarkeit:** Durchgängiges Logging aller Skript-Läufe für eine lückenlose Dokumentation.
-* **Sicherheit:** Strikte Trennung von Code und Zugangsdaten über Konfigurationsdateien bzw. Umgebungsvariablen.
-* **Wartbarkeit:** Modularer Aufbau und verständliche Fehlerbehandlung (Error Handling).
+* **Traceability:** Consistent logging of all script executions for complete documentation.
+* **Security:** Strict separation of code and credentials via configuration files or environment variables.
+* **Maintainability:** Modular structure and clear error handling.
 
-## ⚙️ Voraussetzungen & Nutzung
+## ⚙️ Prerequisites & Usage
 
-* **Umgebung:** Python 3.10+ sowie PowerShell 5.1 / 7+ (Windows) oder Bash (Linux)
-* **Konfiguration:** Vor der ersten Ausführung die `config.example.json` kopieren und als `config.json` mit den lokalen Zielpfaden und Datenbank-Parametern speichern.
+* **Environment:** Python 3.10+ as well as PowerShell 5.1 / 7+ (Windows) or Bash (Linux)
+* **Configuration:** Before the first run, copy `config.example.json` and save it as `config.json` with your local target paths and database parameters.
